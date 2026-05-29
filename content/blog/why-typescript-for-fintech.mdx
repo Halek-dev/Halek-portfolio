@@ -1,0 +1,40 @@
+---
+title: "Why I Use TypeScript for Anything Touching Money"
+description: "When an app moves real money, type safety stops being a nicety. How TypeScript catches the bugs that matter most in fintech and marketplace code."
+date: "2026-03-30"
+tags: ["TypeScript", "Fintech", "Architecture"]
+keywords:
+  - "typescript for fintech"
+  - "typescript type safety money"
+  - "why use typescript"
+  - "typescript backend development"
+  - "typescript developer for hire"
+---
+
+In a blog or a marketing site, a type error is an annoyance. In code that moves money, it's a refund, a furious customer, or a financial hole. That's why everything I build that touches money is TypeScript end to end.
+
+## Money has a shape — enforce it
+
+An amount isn't just a number. Is it kobo or naira? Is it the gross or the net? A typed money representation makes it impossible to accidentally pass a display-formatted string where an integer amount belongs. The compiler catches the mismatch before a user ever does.
+
+## State machines become safe
+
+[Order states](/blog/postgres-schema-design-marketplace) — pending, held, released, disputed — modeled as a union type mean the compiler rejects invalid transitions and impossible states. You literally can't write code that releases a refunded order if the types forbid it.
+
+## API and webhook payloads get validated at the edge
+
+[Payment webhooks](/blog/paystack-webhook-security) arrive as untrusted JSON. Typing the expected shape and validating at the boundary means malformed or malicious payloads fail fast and loudly, not silently three functions deep.
+
+## Refactoring stays safe as the product grows
+
+Fintech code accumulates rules — fees, commissions, edge cases. When you need to change the [fee logic](/blog/building-an-affiliate-program), types tell you every place affected. Refactoring without that is how regressions slip into money code.
+
+## The cost is real but worth it
+
+Yes, TypeScript adds friction — type definitions, occasional fights with the compiler. For money code, that friction is the point: it's the compiler doing the worrying so you don't ship the bug.
+
+## Takeaway
+
+Type your money, your states, your payloads. For anything financial, TypeScript turns a class of expensive runtime disasters into cheap compile-time errors. That trade is always worth it.
+
+Building something financial that needs to be correct? [Let's talk](/#contact).

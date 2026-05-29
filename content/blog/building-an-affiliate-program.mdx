@@ -1,0 +1,40 @@
+---
+title: "Building a Referral and Affiliate Program Into Your Product"
+description: "How to wire commission tracking, attribution, and automated payouts into an app — first-touch cookies, signup roles, configurable rates, and scheduled payments."
+date: "2026-04-08"
+tags: ["Fintech", "SaaS", "Growth"]
+keywords:
+  - "build affiliate program software"
+  - "referral system development"
+  - "commission tracking system"
+  - "affiliate attribution implementation"
+  - "in-app referral program"
+---
+
+A referral program turns your users into your growth team — but only if the tracking is fair and the payouts are reliable. Here's how to build one into a product, from [VaultMart's creator affiliate program](/#work).
+
+## Attribution: decide your model up front
+
+The core question: who gets credit for a signup? A common, fair model is **first-touch with a time window** — the first referrer to bring someone, credited via a cookie that lasts (say) 30 days. Store the referral source at signup and it's locked in. Get this clear before writing code; changing attribution later means disputes over money.
+
+## Put the commission rate in one place
+
+Define your rate once, as a single constant or config value, and derive every commission from it. When the rate is one source of truth, you can reason about it, test it, and trust it. Scattering the percentage across the codebase is how you end up overpaying.
+
+## A warning on changing rates
+
+Once affiliates start earning at a rate, lowering it breaks trust badly. Set a rate you can sustain. If anything, design so you *could* raise it — never plan to cut it on people already earning.
+
+## Automate payouts on a schedule
+
+Manual affiliate payouts don't scale and invite errors. Run them on a fixed schedule (VaultMart pays bi-weekly) via a [background job](/blog/payout-automation-nigeria), batching what's owed. Idempotent, logged, predictable.
+
+## Be precise about what earns commission
+
+Does commission apply to the sale, the service fee, the first order only? Define it exactly and compute it from your [centralized fee logic](/blog/postgres-schema-design-marketplace). Vague rules become support tickets.
+
+## Takeaway
+
+Clear attribution, a single rate constant, a sustainable rate you won't cut, scheduled automated payouts, and precise earning rules. That's a referral program that grows your product without becoming a liability.
+
+Want a referral or affiliate system built into your app? [Get in touch](/#contact).

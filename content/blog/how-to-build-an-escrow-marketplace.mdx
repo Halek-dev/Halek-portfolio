@@ -1,0 +1,57 @@
+---
+title: "How to Build an Escrow Marketplace: Architecture, Payments, and the Hard Parts"
+description: "A practical breakdown of building an escrow-based marketplace — how funds are held, when they release, dispute handling, and the payment architecture behind it. From a developer who shipped one."
+date: "2026-05-20"
+tags: ["Escrow", "Marketplace", "Fintech"]
+keywords:
+  - "how to build an escrow marketplace"
+  - "escrow marketplace development"
+  - "escrow payment system architecture"
+  - "p2p marketplace developer"
+  - "marketplace escrow software"
+  - "build escrow app"
+---
+
+Most marketplaces fail on trust, not features. Buyers worry the seller will take the money and vanish; sellers worry the buyer will claim "it never arrived." Escrow solves both — but building it correctly is where a lot of projects quietly break. Here's how the system actually fits together, based on shipping one to production.
+
+## What "escrow" really means in code
+
+Escrow is not a feature you bolt on. It's a state machine that owns the money. At any moment, every order sits in exactly one state:
+
+- **Pending** — buyer has committed but not paid.
+- **Held** — funds captured and locked by the platform, *not* the seller.
+- **Released** — delivery confirmed, funds moved to the seller's balance.
+- **Refunded / Disputed** — something went wrong; a human or a rule decides.
+
+The single most important design rule: **money never goes directly to the seller.** It lands in a platform-controlled account and only moves on an explicit, logged event.
+
+## The payment architecture
+
+You need two distinct flows that people often conflate:
+
+1. **Collections** — taking money from the buyer. A processor like Paystack (in Nigeria) or Stripe handles this.
+2. **Payouts** — sending money to the seller after release. This is a separate rail, often a different provider, because instant payouts and card collections have different fee and settlement profiles.
+
+Keeping a **float** topped up for payouts — so sellers get paid instantly while collections settle on their own schedule — is one of the non-obvious operational realities. Auto-settling collected funds into your payout account keeps that float healthy.
+
+## Auto-release: the feature that makes it usable
+
+If every order required the buyer to manually click "I received it," half of them never would, and sellers would never get paid. The fix is a **time-based auto-release**: if the buyer doesn't dispute within, say, 48 hours of the seller marking the item delivered, funds release automatically. This needs a reliable background job — a cron that runs frequently and processes everything past its deadline.
+
+## Disputes are a product, not an edge case
+
+Budget real design time for disputes. You need:
+
+- A frozen state that halts auto-release the moment a buyer objects.
+- An evidence trail (chat logs, delivery confirmation, timestamps).
+- A clear resolution path — refund, partial refund, or release.
+
+## Fees and verification
+
+Fund a sustainable platform with a transparent fee model — a small buyer service fee, a small vendor fee — computed in one place so it's auditable. And gate sellers behind identity verification (in Nigeria that's NIN/BVN plus phone OTP) to keep fraud out before it starts.
+
+## The takeaway
+
+An escrow marketplace is fundamentally a ledger with rules about *when* money is allowed to move. Get the state machine, the background release job, and the dispute flow right, and the rest is ordinary product work.
+
+If you're planning a marketplace and want it built by someone who has shipped escrow to production, [get in touch](/#contact).

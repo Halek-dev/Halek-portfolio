@@ -1,0 +1,42 @@
+---
+title: "Why Serious Fintech Apps Use Two Payment Providers"
+description: "Running collections through one provider and payouts through another isn't over-engineering — it's how you get reliability, better rates, and instant transfers. Here's the architecture."
+date: "2026-05-06"
+tags: ["Fintech", "Payments", "Architecture"]
+keywords:
+  - "two payment provider architecture"
+  - "collections and payouts separation"
+  - "fintech payment architecture"
+  - "multi provider payment system"
+  - "payment redundancy design"
+---
+
+When you sketch a payment flow, the instinct is one provider for everything. For anything moving real money at scale, splitting collections and payouts across two providers is often the better call. Here's why, and how to wire it.
+
+## The case for splitting
+
+**Different optimization targets.** A collections provider is tuned for accepting card and bank payments with high conversion. A payouts provider is tuned for cheap, fast transfers out. The best at one is rarely the best at both.
+
+**Better economics.** Per-transfer payout fees vary widely between providers. At volume, routing payouts to the cheapest reliable option saves real money.
+
+**Reliability.** If your single provider has an outage, everything stops. With collections and payouts separated, a payout outage doesn't block you from taking money, and vice versa.
+
+## The architecture
+
+A common production pattern:
+
+1. **Collections** run through Provider A (e.g. Paystack), taking buyer payments.
+2. Collected funds **auto-settle** into a bank account that funds Provider B.
+3. **Payouts** to sellers/creators run through Provider B's instant-transfer API, drawing on that [float](/blog/payout-automation-nigeria).
+
+This keeps the payout float topped up automatically and each provider doing what it's best at.
+
+## What this costs you
+
+Two integrations, two sets of webhooks, two reconciliation jobs. It's more surface area. Don't reach for it on day one of a small product — but as volume and payout frequency grow, the reliability and cost wins justify it.
+
+## Takeaway
+
+Collections and payouts are different problems with different ideal tools. Separating them buys reliability and savings at scale, at the cost of integration complexity. Know which side of that tradeoff you're on.
+
+Designing a payment architecture that needs to scale? [Get in touch](/#contact).

@@ -1,0 +1,38 @@
+---
+title: "Securing Paystack Webhooks: Signature Verification and Idempotency Done Right"
+description: "A focused guide to handling Paystack webhooks safely — verifying the signature, preventing duplicate processing, and never trusting an unverified payment event."
+date: "2026-05-08"
+tags: ["Paystack", "Payments", "Security"]
+keywords:
+  - "paystack webhook verification"
+  - "paystack webhook signature"
+  - "secure payment webhook"
+  - "idempotent webhook handling"
+  - "paystack webhook nodejs"
+---
+
+Your webhook endpoint is a public URL that grants people things based on what it's told. If you don't secure it, anyone who finds it can POST a fake "payment succeeded" and walk off with your product. Here's how to lock it down.
+
+## Verify the signature on every request
+
+Paystack signs each webhook with an HMAC using your secret key. On receipt, recompute that HMAC over the raw request body and compare it to the signature header. If they don't match, reject the request — no exceptions. This is the line between a real event and a forged one.
+
+Critically: verify against the **raw** body, not a parsed-and-re-serialized version. Re-serialization can change bytes and break the signature check.
+
+## Make processing idempotent
+
+Webhooks can fire more than once for the same event — retries, network hiccups, provider behavior. If your handler credits an account or releases an order, a duplicate delivery must do nothing the second time. Key your processing on the transaction reference and check whether you've already handled it before acting.
+
+## Respond fast, process async
+
+Return a 200 quickly so the provider doesn't keep retrying. Do the heavy work (updating orders, sending emails) after acknowledging, ideally via a queue. A slow webhook handler causes retries, which compounds your idempotency problem.
+
+## Never let the webhook be the *only* source of truth
+
+Webhooks occasionally never arrive. Pair them with [server-side verification](/blog/paystack-nextjs-production-checklist) at the moment of action, plus a reconciliation job that catches anything missed. Defense in depth.
+
+## Takeaway
+
+Verify the signature against the raw body, make handlers idempotent, ack fast and process async, and reconcile as backup. That's a webhook endpoint you can trust with money.
+
+Wiring up payments and want it secure from day one? [Let's talk](/#contact).

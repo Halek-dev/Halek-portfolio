@@ -1,0 +1,40 @@
+---
+title: "Deploying Next.js: Vercel vs Railway, and What to Set Up First"
+description: "A practical comparison of deploying Next.js on Vercel and Railway, plus the environment variables, domains, and analytics you should configure on day one."
+date: "2026-04-04"
+tags: ["Next.js", "Deployment", "DevOps"]
+keywords:
+  - "deploy next.js vercel railway"
+  - "vercel vs railway next.js"
+  - "next.js deployment guide"
+  - "hosting next.js app"
+  - "next.js production setup"
+---
+
+You've built the app; now it has to go live and stay live. Here's how I think about deploying Next.js, and the setup that prevents day-two headaches.
+
+## Vercel vs Railway
+
+**Vercel** is the path of least resistance for Next.js — it's built by the same team, auto-detects everything, and handles the App Router's edge and serverless behavior natively. For a portfolio, marketing site, or most apps, it's the default.
+
+**Railway** shines when your app is more than a frontend — when you want a long-running server, a database, background workers, and cron jobs living together. I run [larger apps on Railway](/#work) for exactly that reason: it's a full environment, not just frontend hosting.
+
+The rule of thumb: frontend-heavy or static-leaning → Vercel; full backend with persistent services → Railway.
+
+## Set environment variables before your first deploy
+
+Secrets, API keys, database URLs — these live in the platform's environment settings, never in your code. Remember the Next.js rule: only `NEXT_PUBLIC_`-prefixed vars reach the browser, and those are visible to anyone, so keep real secrets server-side.
+
+## Add your domain and analytics on day one
+
+Point your custom domain early so you're testing the real URL. And wire up analytics immediately — you want visitor data from the first day, not retroactively. On Vercel, that's a one-line addition.
+
+## Deploy early, before it's "ready"
+
+[Environment-specific issues](/blog/nextjs-app-router-production) — fonts, caching, env vars — only show up in production. Deploy behind a password while building so these surface cheaply.
+
+## Takeaway
+
+Vercel for frontend-leaning apps, Railway for full backends, env vars and domain and analytics configured up front, and deploy early to catch the real issues. Boring, reliable deploys are the goal.
+
+Need your app deployed and production-ready? [Reach out](/#contact).

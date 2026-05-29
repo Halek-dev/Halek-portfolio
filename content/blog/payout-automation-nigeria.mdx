@@ -1,0 +1,40 @@
+---
+title: "Automating Payouts in Nigeria: Float, Providers, and Instant Transfers"
+description: "How to send money out at scale in Nigeria — managing float, choosing payout providers, handling failures, and keeping instant transfers reliable for a marketplace or fintech app."
+date: "2026-05-10"
+tags: ["Fintech", "Payments", "Nigeria"]
+keywords:
+  - "payout automation nigeria"
+  - "instant payout api nigeria"
+  - "automated bank transfer nigeria"
+  - "marketplace payout system"
+  - "fintech payout developer"
+---
+
+Collecting money is the easy half. *Sending* it — to vendors, creators, sellers — at scale, instantly, without losing track of a single naira, is where fintech apps get hard. Here's what actually matters.
+
+## Collections and payouts are different rails
+
+The provider that's great at taking card payments isn't necessarily the one you want pushing money out. Collections optimize for conversion; payouts optimize for speed and low per-transfer cost. Many production setups use one provider for [collections (like Paystack)](/blog/paystack-nextjs-production-checklist) and another for instant payouts.
+
+## Float is the concept nobody warns you about
+
+If you want sellers paid *instantly* but your collections only settle to you on T+1, you need a pool of money sitting ready to pay out now — your float. The trick is keeping it topped up automatically: auto-settle collected funds into the payout account so the float refills as money comes in. Run dry and payouts fail; overfund it and you've got idle cash.
+
+## Make payouts idempotent and logged
+
+A payout request that times out must never result in a double-send. Key every payout on a unique reference, check status before retrying, and log every state transition. Money movement with no audit trail is a disaster waiting to happen.
+
+## Handle the failure modes explicitly
+
+Bank down, wrong account number, daily limit hit — each needs a defined behavior: retry, queue, or flag for manual review. Silent failures are how sellers end up unpaid and angry.
+
+## Bi-weekly or instant?
+
+Not everything needs to be instant. [VaultMart's creator program](/#work) pays bi-weekly on fixed dates via a scheduled job — predictable, batchable, cheaper. Instant payouts cost more per transfer; reserve them for where speed is the product.
+
+## Takeaway
+
+Separate your rails, automate your float, make every transfer idempotent and logged. Get those right and payouts become boring — exactly what money movement should be.
+
+Need reliable payouts built into your product? [Reach out](/#contact).

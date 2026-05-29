@@ -1,0 +1,40 @@
+---
+title: "Building a Food Ordering System: Menus, Carts, and Fulfilment"
+description: "What goes into a restaurant or cafe ordering app — live menus, a reliable cart, dine-in vs delivery flows, and an admin to manage it all. A developer's breakdown."
+date: "2026-04-16"
+tags: ["Web Development", "Ordering", "Product"]
+keywords:
+  - "food ordering app development"
+  - "restaurant ordering system"
+  - "cafe ordering website"
+  - "build online ordering system"
+  - "menu management system"
+---
+
+A food ordering system looks simple — show a menu, take an order. The complexity hides in the details: live availability, a cart that never loses items, and fulfilment that works for dine-in, takeaway, and delivery alike. Here's the anatomy, from building [15'06 Café's](/#work) ordering platform.
+
+## The menu is live data, not a static page
+
+Items sell out. Prices change. New specials appear. The menu needs to be data the owner controls through an admin — not hardcoded HTML someone has to edit. A simple admin where staff toggle availability and update prices is what keeps the menu honest.
+
+## The cart must be bulletproof
+
+Nothing kills an order like a cart that drops items or miscalculates the total. Keep cart state reliable, recompute totals from source data (never trust a stored total), and make adding/removing instant. The cart is where buying intent lives — protect it.
+
+## Fulfilment modes change the flow
+
+Dine-in, takeaway, and delivery aren't the same order with a different label. Delivery needs an address and a fee; dine-in might need a table number; takeaway needs a pickup time. Model the fulfilment type explicitly and branch the flow accordingly.
+
+## Give the owner a real admin
+
+The person running the cafe isn't going to call you to add a doughnut. An admin to manage menu items, see incoming orders, and update availability is what makes the system *theirs*. This is the same [content-you-control principle](/blog/idea-to-live-saas-mvp) behind any good product.
+
+## Keep it fast on a phone
+
+Most food orders happen on a phone, often on patchy data. A fast, lightweight frontend matters more here than almost anywhere — a slow menu loses the order.
+
+## Takeaway
+
+Live menu the owner controls, a cart you can trust, explicit fulfilment modes, a real admin, and phone-first speed. That's an ordering system that actually gets used.
+
+Want an ordering system built for your restaurant or cafe? [Reach out](/#contact).

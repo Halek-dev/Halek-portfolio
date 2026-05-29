@@ -1,0 +1,36 @@
+---
+title: "Building a CRM From Scratch: Real-Time Inbox, Segmentation, and Analytics"
+description: "What it takes to build a custom CRM — a real-time inbox, auto-segmented audience lists, mass messaging with safeguards, and revenue analytics. Lessons from shipping one."
+date: "2026-04-20"
+tags: ["SaaS", "CRM", "Architecture"]
+keywords:
+  - "build a crm from scratch"
+  - "custom crm development"
+  - "real-time inbox implementation"
+  - "audience segmentation system"
+  - "crm developer for hire"
+---
+
+Off-the-shelf CRMs are generic by design. When a business has a specific workflow — a specific way it segments customers, messages them, and tracks revenue — a custom CRM can be a genuine edge. Here's what building one actually involves, from shipping [RanDall](/#work).
+
+## The real-time inbox is the hard part
+
+Users expect messages to appear instantly, read receipts to update live, and search to be fast across thousands of conversations. That means real-time data sync, not polling, and a data model that makes "all messages with this contact, newest first" a fast query. Get the inbox right and the CRM feels alive; get it wrong and it feels broken.
+
+## Segmentation has to run in the background
+
+Audience segments — top spenders, recent joiners, dormant contacts — shouldn't be computed when someone opens a page; they'd wait forever. Run segmentation on a schedule in the background and keep the segments synced, so the UI just reads ready-made lists. This is a recurring pattern: [precompute the expensive thing](/blog/postgres-schema-design-marketplace), serve it instantly.
+
+## Mass messaging needs guardrails
+
+Sending to thousands at once is easy to get dangerously wrong. Build in an avoid-list (don't re-message someone you just contacted), audit every send, and track delivery and engagement. The safeguards are as important as the send button.
+
+## Analytics that answer real questions
+
+"Which message made money" and "who are my biggest spenders" are the questions that justify a CRM. Model your data so those are simple, fast queries — daily revenue by campaign, by source, by contact.
+
+## Takeaway
+
+A custom CRM lives or dies on the inbox feeling instant, segmentation running quietly in the background, messaging having guardrails, and analytics answering money questions. Build those four well and you've got a tool worth more than any generic option.
+
+Need a CRM built around your actual workflow? [Get in touch](/#contact).

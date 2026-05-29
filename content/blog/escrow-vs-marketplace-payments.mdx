@@ -1,0 +1,40 @@
+---
+title: "Escrow vs Direct Payments: Which Does Your Marketplace Actually Need?"
+description: "Not every marketplace needs escrow. A clear breakdown of when to hold funds, when to pay sellers directly, and how to decide based on trust, ticket size, and dispute risk."
+date: "2026-05-18"
+tags: ["Escrow", "Marketplace", "Payments"]
+keywords:
+  - "escrow vs direct payment marketplace"
+  - "when to use escrow marketplace"
+  - "marketplace payment models"
+  - "split payment vs escrow"
+  - "marketplace payout models"
+---
+
+"Should we use escrow?" is the wrong first question. The right one is: *how much does a buyer stand to lose if the seller doesn't deliver, and how likely is that?* Answer that honestly and the payment model picks itself.
+
+## Three common models
+
+**Direct payment** — money goes straight to the seller. Fast, cheap, simple. Right for low-risk, low-ticket, repeat-relationship sales where fraud is rare and refunds are easy.
+
+**Split / delayed payout** — the platform collects, then pays the seller on a schedule (e.g. weekly). Gives you a window to claw back on chargebacks without full escrow complexity.
+
+**Full escrow** — funds are held and only released on delivery confirmation. Necessary when buyers and sellers are strangers, ticket sizes are meaningful, and "it never arrived" is a realistic dispute. This is what I built for [VaultMart](/#work).
+
+## How to decide
+
+Ask three questions:
+
+1. **What's the average order value?** Higher value tilts toward escrow.
+2. **Do buyer and seller have a prior relationship?** Strangers tilt toward escrow.
+3. **How bad is a dispute?** Physical goods shipped across the country with no tracking tilt hard toward escrow.
+
+## The cost of escrow
+
+Escrow isn't free. It adds a state machine, a release mechanism, dispute handling, and float management for payouts. If your risk profile doesn't justify it, you're adding complexity for no benefit. I cover the full build in [How to Build an Escrow Marketplace](/blog/how-to-build-an-escrow-marketplace).
+
+## The honest answer
+
+Start with the simplest model your risk allows. You can always add holding logic later — but don't build escrow because it sounds safe if direct payment fits your actual risk.
+
+Planning a marketplace and unsure which model fits? [Let's talk it through](/#contact).

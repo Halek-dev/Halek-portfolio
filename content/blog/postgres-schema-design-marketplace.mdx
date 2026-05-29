@@ -1,0 +1,40 @@
+---
+title: "Designing a PostgreSQL Schema for a Marketplace That Won't Need a Rewrite"
+description: "The data model decisions that make or break a marketplace — orders as state machines, money as integers, audit trails, and the schema mistakes that force painful migrations."
+date: "2026-04-28"
+tags: ["PostgreSQL", "Architecture", "Marketplace"]
+keywords:
+  - "postgresql schema design marketplace"
+  - "database design for marketplace"
+  - "marketplace data model"
+  - "order state machine database"
+  - "storing money in database"
+---
+
+A messy data model is the thing that quietly kills a product — not ugly UI, which is cheap to fix, but a schema that can't represent reality without painful migrations. Here are the decisions that matter most for a marketplace.
+
+## Model orders as explicit states
+
+An order isn't "done or not done." It's pending, held, shipped, delivered, released, disputed, refunded. Store the state as an explicit column with a constrained set of values, and log every transition with a timestamp. This [state machine](/blog/how-to-build-an-escrow-marketplace) is the backbone of escrow, disputes, and analytics alike.
+
+## Store money as integers
+
+Never store money as a float. Floating-point rounding errors will eventually cost you real naira and hours of debugging. Store the smallest unit (kobo) as an integer and format for display. This is non-negotiable in anything financial.
+
+## Separate immutable facts from mutable state
+
+A transaction *happened* — that record should never change. An order's *status* changes constantly. Keep the immutable ledger of money movements separate from the mutable order state. When a dispute arises, the ledger is your source of truth.
+
+## Compute fees in one place
+
+Buyer fees, seller fees, minimums — derive these from a single config and a single function, not arithmetic scattered across the codebase. When you need to audit "why was this fee this amount," you'll be grateful it's one testable place.
+
+## Design for the query you'll run constantly
+
+You will, every day, ask "what's held right now," "what disputes are open," "what's today's volume." Index for those. A schema that's clean but slow on your hottest query is still a problem.
+
+## Takeaway
+
+Orders as states, money as integers, facts separate from status, fees centralized, indexes for your hot paths. Get the model right and the rest of the product nearly builds itself.
+
+Need a data model that scales with your product? [Reach out](/#contact).

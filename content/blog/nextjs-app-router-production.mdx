@@ -1,0 +1,40 @@
+---
+title: "Next.js App Router in Production: What I Learned Shipping Real Apps"
+description: "Server components, server actions, data fetching, and the gotchas that only show up once real users hit your Next.js App Router app. Lessons from production."
+date: "2026-05-02"
+tags: ["Next.js", "React", "Architecture"]
+keywords:
+  - "next.js app router production"
+  - "next.js server components guide"
+  - "next.js server actions"
+  - "next.js best practices"
+  - "next.js developer for hire"
+---
+
+The App Router is powerful, but the demos don't prepare you for production. Here's what I've learned shipping real Next.js apps — marketplaces, CRMs, ordering systems — with it.
+
+## Server components are the default for a reason
+
+Fetch data on the server, render there, send HTML. Most of your pages don't need to be interactive — they need to be fast and crawlable. Reach for `"use client"` only at the leaves where you actually need state or browser APIs. Pushing the client boundary down keeps bundles small and pages quick.
+
+## Server actions replace half your API routes
+
+For mutations — submitting a form, updating a record — server actions let you skip writing a separate API endpoint and the fetch call to hit it. Less boilerplate, less surface area. But validate inputs as rigorously as you would an API; a server action is still a public entry point.
+
+## Watch the client/server data boundary
+
+The mistake I see most: trying to use server-only data (env secrets, DB clients) in a client component, or shipping a huge payload from server to client to hydrate. Be deliberate about what crosses the boundary. Sensitive logic stays server-side — this matters doubly for anything touching [payments](/blog/paystack-nextjs-production-checklist).
+
+## Caching will surprise you
+
+The App Router caches aggressively by default. That's great until you're staring at stale data wondering why your update didn't show. Learn the revalidation tools early — it'll save you hours of confusion.
+
+## Deploy early to catch the real issues
+
+Things that work on localhost — fonts, env vars, caching behavior — break differently in production. [Deploy early and often](/blog/idea-to-live-saas-mvp) so the environment-specific problems surface while they're cheap to fix.
+
+## Takeaway
+
+Default to server, push interactivity to the leaves, respect the data boundary, and learn caching before it bites. The App Router rewards working *with* its model rather than fighting it.
+
+Building on Next.js and want it done right? [Let's talk](/#contact).
