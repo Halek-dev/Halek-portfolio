@@ -1,34 +1,28 @@
 import type { Metadata } from "next";
-import { Fraunces, Outfit, JetBrains_Mono } from "next/font/google";
+import { Libre_Franklin, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site";
 import { Analytics } from "@vercel/analytics/react";
+import SetupNotice from "@/components/SetupNotice";
 
-const display = Fraunces({
+// Franklin Gothic lineage: newsroom authority, no softness, and a
+// weight range wide enough to carry the whole page on its own.
+const sans = Libre_Franklin({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "900"],
-  variable: "--font-display",
+  variable: "--font-sans",
   display: "swap",
 });
-const body = Outfit({
+
+// Reserved for prose. The serif earns its place on paragraphs, never on headings.
+const serif = Source_Serif_4({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-body",
-  display: "swap",
-});
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
+  variable: "--font-serif",
   display: "swap",
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-icon.png",
-  },
+  icons: { icon: "/favicon.ico", apple: "/apple-icon.png" },
   title: {
     default: "Olalekan Kazeem (Halek) — Full-Stack Developer",
     template: "%s · Halek",
@@ -44,6 +38,7 @@ export const metadata: Metadata = {
     "saas developer",
     "freelance web developer",
   ],
+  alternates: { canonical: SITE_URL },
   openGraph: {
     type: "website",
     title: "Olalekan Kazeem (Halek) — Full-Stack Developer",
@@ -64,9 +59,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
-      <body className="bg-ink text-bone font-body antialiased">
+    <html lang="en" className={`${sans.variable} ${serif.variable}`}>
+      <body>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-menu focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-paper"
+        >
+          Skip to content
+        </a>
         {children}
+        <SetupNotice />
         <Analytics />
       </body>
     </html>

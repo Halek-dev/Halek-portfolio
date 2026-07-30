@@ -1,14 +1,21 @@
 "use client";
+
 import { useState } from "react";
 import Link from "next/link";
 import { usePortfolioData } from "@/components/usePortfolioData";
-import { PortfolioData, Project } from "@/lib/data";
+import type { PortfolioData, Project } from "@/lib/data";
 
-// Set NEXT_PUBLIC_ADMIN_PASSWORD in .env.local (falls back to the literal below).
-// NOTE: NEXT_PUBLIC_ vars are bundled into client JS and readable by anyone who
-// inspects the page. The admin only edits your local browser copy, so this is
-// convenience, not real security.
+// NOTE: NEXT_PUBLIC_ vars are bundled into client JS and readable by anyone
+// who inspects the page. This panel only edits your local browser copy, so
+// the password is convenience, not security.
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "change-me-halek";
+
+const BLANK_PANEL = {
+  bg: "oklch(0.300 0.090 30)",
+  fg: "oklch(0.960 0.020 60)",
+  ac: "oklch(0.760 0.110 45)",
+  mut: "oklch(0.845 0.045 45)",
+};
 
 export default function Admin() {
   const { data, save, reset, loaded } = usePortfolioData();
@@ -24,28 +31,29 @@ export default function Admin() {
 
   if (!authed) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-6">
-        <div className="w-full max-w-sm rounded-3xl border border-edge bg-surface p-8">
-          <h1 className="font-display text-2xl font-semibold">Admin access</h1>
-          <p className="mt-2 text-sm text-muted">Enter your password to edit content.</p>
+      <div className="flex min-h-screen items-center justify-center px-5">
+        <div className="w-full max-w-sm border border-ink p-7">
+          <h1 className="text-xl font-extrabold tracking-[-0.03em]">Editor</h1>
+          <p className="mt-1.5 text-sm text-ink-50">Enter your password to edit content.</p>
           <input
             type="password"
             value={pw}
             onChange={(e) => setPw(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && setAuthed(pw === ADMIN_PASSWORD)}
             placeholder="Password"
-            className="mt-4 w-full rounded-xl border border-edge bg-ink px-4 py-3 text-bone outline-none focus:border-accent"
+            aria-label="Admin password"
+            className="mt-5 w-full border border-rule-2 bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-ink"
           />
           <button
             onClick={() => setAuthed(pw === ADMIN_PASSWORD)}
-            className="mt-3 w-full rounded-xl bg-accent py-3 font-medium text-ink"
+            className="mt-2.5 w-full bg-ink py-3 text-sm font-semibold text-paper transition-colors hover:bg-red"
           >
             Unlock
           </button>
           {pw && pw !== ADMIN_PASSWORD && (
-            <p className="mt-3 text-sm text-red-400">Wrong password.</p>
+            <p className="mt-3 text-sm text-red">Wrong password.</p>
           )}
-          <Link href="/" className="mt-4 block text-center text-xs text-muted">
+          <Link href="/" className="mt-5 block text-center text-2xs text-ink-50">
             ← back to site
           </Link>
         </div>
@@ -88,7 +96,12 @@ export default function Admin() {
     projects[i] = { ...projects[i], ...patch };
     update({ projects });
   };
-  const addProject = () => {
+  const updatePanel = (i: number, key: "bg" | "fg" | "ac" | "mut", value: string) => {
+    const projects = [...d.projects];
+    projects[i] = { ...projects[i], panel: { ...projects[i].panel, [key]: value } };
+    update({ projects });
+  };
+  const addProject = () =>
     update({
       projects: [
         ...d.projects,
@@ -102,90 +115,98 @@ export default function Admin() {
           year: String(new Date().getFullYear()),
           featured: false,
           image: "",
+          alt: "",
+          panel: { ...BLANK_PANEL },
         },
       ],
     });
-  };
   const removeProject = (i: number) =>
     update({ projects: d.projects.filter((_, idx) => idx !== i) });
 
   const input =
-    "w-full rounded-lg border border-edge bg-ink px-3 py-2 text-sm text-bone outline-none focus:border-accent";
-  const label = "block font-mono text-xs uppercase tracking-widest text-muted mb-1";
+    "w-full border border-rule-2 bg-paper px-3 py-2 text-sm outline-none focus:border-ink";
+  const label = "block text-2xs font-semibold uppercase tracking-[0.07em] text-ink-50 mb-1";
+  const section = "mt-6 border border-rule bg-paper-2 p-6";
+  const h2 = "text-lg font-extrabold tracking-[-0.03em]";
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-10">
-      <div className="sticky top-0 z-20 -mx-6 mb-8 flex items-center justify-between border-b border-edge bg-ink/90 px-6 py-4 backdrop-blur">
-        <h1 className="font-display text-2xl font-semibold">Editor</h1>
-        <div className="flex items-center gap-2">
-          {msg && <span className="text-sm text-accent">{msg}</span>}
-          <button onClick={exportJson} className="rounded-lg border border-edge px-3 py-2 text-sm">
+    <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8">
+      <div className="sticky top-0 z-nav -mx-5 mb-7 flex flex-wrap items-center justify-between gap-3 border-b border-ink bg-paper px-5 py-3.5 sm:-mx-8 sm:px-8">
+        <h1 className={h2}>Editor</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          {msg && <span className="text-sm font-medium text-red">{msg}</span>}
+          <button onClick={exportJson} className="border border-rule-2 px-3 py-2 text-sm">
             Export JSON
           </button>
-          <label className="cursor-pointer rounded-lg border border-edge px-3 py-2 text-sm">
+          <label className="cursor-pointer border border-rule-2 px-3 py-2 text-sm">
             Import
             <input type="file" accept="application/json" onChange={importJson} className="hidden" />
           </label>
-          <button onClick={saveAll} className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-ink">
+          <button
+            onClick={saveAll}
+            className="bg-ink px-4 py-2 text-sm font-semibold text-paper transition-colors hover:bg-red"
+          >
             Save
           </button>
         </div>
       </div>
 
-      <div className="rounded-lg border border-accent2/30 bg-accent2/10 p-4 text-sm text-bone/80">
-        Edits save to <strong>this browser only</strong>. To publish changes to the live site,
-        click <strong>Export JSON</strong>, replace <code className="text-accent">data/portfolio-data.json</code> in
-        your repo, and push to redeploy.
+      <div className="border-l-0 border-t-2 border-ink bg-paper-2 p-4 text-sm text-ink-70">
+        Edits save to <strong className="text-ink">this browser only</strong>. To publish, click{" "}
+        <strong className="text-ink">Export JSON</strong>, paste the result over{" "}
+        <code className="bg-paper-3 px-1">defaultData</code> in{" "}
+        <code className="bg-paper-3 px-1">lib/data.ts</code>, then commit and push.
+        <br />
+        <span className="mt-2 block text-ink-50">
+          Case-study prose is long-form and lives in <code>lib/data.ts</code> — edit it there rather
+          than through a textarea grid.
+        </span>
       </div>
 
       {/* ANALYTICS */}
-      <section className="mt-8 space-y-3 rounded-2xl border border-edge bg-surface p-6">
-        <h2 className="font-display text-xl">Daily visits</h2>
-        <p className="text-sm text-muted">
-          Real per-day visitor counts are tracked by <strong>Vercel Analytics</strong> (already wired
-          into the site). Visitor data can't be securely pulled into this browser-only panel, so you
-          read it in your Vercel dashboard — it shows daily visitors, page views, top pages, and
-          referrers.
+      <section className={section}>
+        <h2 className={h2}>Daily visits</h2>
+        <p className="mt-2 text-sm text-ink-70">
+          Per-day visitor counts are tracked by <strong className="text-ink">Vercel Analytics</strong>,
+          already wired into the site. That data can&apos;t be securely pulled into a browser-only
+          panel, so read it in your Vercel dashboard.
         </p>
         <a
           href="https://vercel.com/dashboard"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block rounded-lg bg-accent px-4 py-2 text-sm font-medium text-ink"
+          className="mt-3 inline-block bg-ink px-4 py-2 text-sm font-semibold text-paper"
         >
           Open Vercel Analytics →
         </a>
-        <p className="text-xs text-muted">
-          In Vercel: select your project → <strong>Analytics</strong> tab. Enable it once (free tier)
-          on first visit. Data appears within a day of going live.
-        </p>
       </section>
 
       {/* PROFILE */}
-      <section className="mt-8 space-y-4 rounded-2xl border border-edge bg-surface p-6">
-        <h2 className="font-display text-xl">Profile</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <span className={label}>Name</span>
-            <input className={input} value={d.name} onChange={(e) => update({ name: e.target.value })} />
-          </div>
-          <div>
-            <span className={label}>Handle</span>
-            <input className={input} value={d.handle} onChange={(e) => update({ handle: e.target.value })} />
-          </div>
-          <div>
-            <span className={label}>Role</span>
-            <input className={input} value={d.role} onChange={(e) => update({ role: e.target.value })} />
-          </div>
-          <div>
-            <span className={label}>Location</span>
-            <input className={input} value={d.location} onChange={(e) => update({ location: e.target.value })} />
-          </div>
+      <section className={section}>
+        <h2 className={h2}>Profile</h2>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          {([
+            ["Name", "name"],
+            ["Handle", "handle"],
+            ["Role", "role"],
+            ["Location", "location"],
+            ["Availability", "availability"],
+            ["Email (primary CTA)", "email"],
+          ] as const).map(([lbl, key]) => (
+            <div key={key}>
+              <span className={label}>{lbl}</span>
+              <input
+                className={input}
+                value={(d[key] as string) ?? ""}
+                onChange={(e) => update({ [key]: e.target.value } as Partial<PortfolioData>)}
+              />
+            </div>
+          ))}
         </div>
-        <div>
-          <span className={label}>Bio</span>
+        <div className="mt-4">
+          <span className={label}>Bio (hero paragraph)</span>
           <textarea
-            className={`${input} h-28`}
+            className={`${input} h-32`}
             value={d.bio}
             onChange={(e) => update({ bio: e.target.value })}
           />
@@ -193,203 +214,256 @@ export default function Admin() {
       </section>
 
       {/* CONTACTS */}
-      <section className="mt-6 space-y-4 rounded-2xl border border-edge bg-surface p-6">
-        <h2 className="font-display text-xl">Contacts</h2>
-        {d.contacts.map((c, i) => (
-          <div key={i} className="grid gap-2 sm:grid-cols-3">
-            <input
-              className={input}
-              placeholder="Label"
-              value={c.label}
-              onChange={(e) => {
-                const contacts = [...d.contacts];
-                contacts[i] = { ...c, label: e.target.value };
-                update({ contacts });
-              }}
-            />
-            <input
-              className={input}
-              placeholder="Display text"
-              value={c.value}
-              onChange={(e) => {
-                const contacts = [...d.contacts];
-                contacts[i] = { ...c, value: e.target.value };
-                update({ contacts });
-              }}
-            />
-            <div className="flex gap-2">
+      <section className={section}>
+        <h2 className={h2}>Contacts</h2>
+        <p className="mt-1.5 text-sm text-ink-50">
+          Entries with an empty or <code>#</code> link are hidden on the live site.
+        </p>
+        <div className="mt-4 space-y-2">
+          {d.contacts.map((c, i) => (
+            <div key={i} className="grid gap-2 sm:grid-cols-3">
               <input
                 className={input}
-                placeholder="Link (https:// or mailto:)"
-                value={c.href}
+                placeholder="Label"
+                value={c.label}
                 onChange={(e) => {
                   const contacts = [...d.contacts];
-                  contacts[i] = { ...c, href: e.target.value };
+                  contacts[i] = { ...c, label: e.target.value };
                   update({ contacts });
                 }}
               />
-              <button
-                onClick={() => update({ contacts: d.contacts.filter((_, idx) => idx !== i) })}
-                className="rounded-lg border border-edge px-3 text-muted hover:text-red-400"
-              >
-                ✕
-              </button>
+              <input
+                className={input}
+                placeholder="Display text"
+                value={c.value}
+                onChange={(e) => {
+                  const contacts = [...d.contacts];
+                  contacts[i] = { ...c, value: e.target.value };
+                  update({ contacts });
+                }}
+              />
+              <div className="flex gap-2">
+                <input
+                  className={input}
+                  placeholder="https:// or mailto:"
+                  value={c.href}
+                  onChange={(e) => {
+                    const contacts = [...d.contacts];
+                    contacts[i] = { ...c, href: e.target.value };
+                    update({ contacts });
+                  }}
+                />
+                <button
+                  onClick={() => update({ contacts: d.contacts.filter((_, x) => x !== i) })}
+                  aria-label={`Remove ${c.label || "contact"}`}
+                  className="border border-rule-2 px-3 text-ink-50 hover:text-red"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
         <button
           onClick={() => update({ contacts: [...d.contacts, { label: "", value: "", href: "" }] })}
-          className="rounded-lg border border-edge px-4 py-2 text-sm"
+          className="mt-3 border border-rule-2 px-4 py-2 text-sm"
         >
           + Add contact
         </button>
       </section>
 
       {/* PROJECTS */}
-      <section className="mt-6 space-y-4 rounded-2xl border border-edge bg-surface p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl">Projects</h2>
-          <button onClick={addProject} className="rounded-lg border border-edge px-4 py-2 text-sm">
+      <section className={section}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className={h2}>Projects</h2>
+          <button onClick={addProject} className="border border-rule-2 px-4 py-2 text-sm">
             + Add project
           </button>
         </div>
-        {d.projects.map((p, i) => (
-          <div key={p.id} className="space-y-3 rounded-xl border border-edge bg-ink p-4">
-            <div className="flex items-center justify-between">
-              <div className="grid flex-1 gap-2 sm:grid-cols-2">
+
+        <div className="mt-4 space-y-4">
+          {d.projects.map((p, i) => (
+            <div key={p.id} className="space-y-3 border border-rule bg-paper p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="grid flex-1 gap-2 sm:grid-cols-2">
+                  <input
+                    className={input}
+                    placeholder="Name"
+                    value={p.name}
+                    onChange={(e) => updateProject(i, { name: e.target.value })}
+                  />
+                  <input
+                    className={input}
+                    placeholder="Tagline"
+                    value={p.tagline}
+                    onChange={(e) => updateProject(i, { tagline: e.target.value })}
+                  />
+                </div>
+                <button
+                  onClick={() => removeProject(i)}
+                  className="border border-rule-2 px-3 py-2 text-sm text-ink-50 hover:text-red"
+                >
+                  Delete
+                </button>
+              </div>
+
+              <textarea
+                className={`${input} h-20`}
+                placeholder="Description"
+                value={p.description}
+                onChange={(e) => updateProject(i, { description: e.target.value })}
+              />
+
+              <div className="grid gap-2 sm:grid-cols-3">
                 <input
                   className={input}
-                  placeholder="Name"
-                  value={p.name}
-                  onChange={(e) => updateProject(i, { name: e.target.value })}
+                  placeholder="Live URL"
+                  value={p.url}
+                  onChange={(e) => updateProject(i, { url: e.target.value })}
                 />
                 <input
                   className={input}
-                  placeholder="Tagline"
-                  value={p.tagline}
-                  onChange={(e) => updateProject(i, { tagline: e.target.value })}
+                  placeholder="Year"
+                  value={p.year}
+                  onChange={(e) => updateProject(i, { year: e.target.value })}
+                />
+                <input
+                  className={input}
+                  placeholder="Stack (comma separated)"
+                  value={p.stack.join(", ")}
+                  onChange={(e) =>
+                    updateProject(i, {
+                      stack: e.target.value.split(",").map((s) => s.trim()).filter(Boolean),
+                    })
+                  }
                 />
               </div>
-              <button
-                onClick={() => removeProject(i)}
-                className="ml-3 rounded-lg border border-edge px-3 py-2 text-muted hover:text-red-400"
-              >
-                Delete
-              </button>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                <input
+                  className={input}
+                  placeholder="/projects/name.png"
+                  value={p.image ?? ""}
+                  onChange={(e) => updateProject(i, { image: e.target.value })}
+                />
+                <input
+                  className={input}
+                  placeholder="Alt text — describe the thing, not the category"
+                  value={p.alt ?? ""}
+                  onChange={(e) => updateProject(i, { alt: e.target.value })}
+                />
+              </div>
+
+              {/* panel colours */}
+              <div>
+                <span className={label}>
+                  Panel colours — OKLCH. Borrow the product&apos;s own brand colour.
+                </span>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {(["bg", "fg", "ac", "mut"] as const).map((key) => (
+                    <div key={key} className="flex items-center gap-2">
+                      <span
+                        aria-hidden
+                        className="h-8 w-8 shrink-0 border border-rule-2"
+                        style={{ background: p.panel?.[key] ?? "transparent" }}
+                      />
+                      <input
+                        className={input}
+                        placeholder={key}
+                        value={p.panel?.[key] ?? ""}
+                        onChange={(e) => updatePanel(i, key, e.target.value)}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-1.5 text-2xs text-ink-50">
+                  fg, ac and mut must each clear 4.5:1 against bg. Never dim panel text with opacity — use mut.
+                </p>
+              </div>
+
+              <label className="flex items-center gap-2 text-sm text-ink-70">
+                <input
+                  type="checkbox"
+                  checked={p.featured}
+                  onChange={(e) => updateProject(i, { featured: e.target.checked })}
+                />
+                Featured
+              </label>
             </div>
-            <textarea
-              className={`${input} h-20`}
-              placeholder="Description"
-              value={p.description}
-              onChange={(e) => updateProject(i, { description: e.target.value })}
-            />
-            <div className="grid gap-2 sm:grid-cols-3">
-              <input
-                className={input}
-                placeholder="Live URL"
-                value={p.url}
-                onChange={(e) => updateProject(i, { url: e.target.value })}
-              />
-              <input
-                className={input}
-                placeholder="Year"
-                value={p.year}
-                onChange={(e) => updateProject(i, { year: e.target.value })}
-              />
-              <input
-                className={input}
-                placeholder="Stack (comma separated)"
-                value={p.stack.join(", ")}
-                onChange={(e) =>
-                  updateProject(i, {
-                    stack: e.target.value.split(",").map((s) => s.trim()).filter(Boolean),
-                  })
-                }
-              />
-            </div>
-            <input
-              className={input}
-              placeholder="Image path (e.g. /projects/vaultmart.png — put file in public/projects/)"
-              value={p.image ?? ""}
-              onChange={(e) => updateProject(i, { image: e.target.value })}
-            />
-            <label className="flex items-center gap-2 text-sm text-muted">
-              <input
-                type="checkbox"
-                checked={p.featured}
-                onChange={(e) => updateProject(i, { featured: e.target.checked })}
-              />
-              Featured (large card)
-            </label>
-          </div>
-        ))}
+          ))}
+        </div>
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="mt-6 space-y-4 rounded-2xl border border-edge bg-surface p-6">
-        <h2 className="font-display text-xl">Testimonials</h2>
-        {(d.testimonials ?? []).map((t, i) => (
-          <div key={i} className="space-y-2 rounded-xl border border-edge bg-ink p-4">
-            <textarea
-              className={`${input} h-20`}
-              placeholder="Quote"
-              value={t.quote}
-              onChange={(e) => {
-                const testimonials = [...d.testimonials];
-                testimonials[i] = { ...t, quote: e.target.value };
-                update({ testimonials });
-              }}
-            />
-            <div className="grid gap-2 sm:grid-cols-[2fr_2fr_auto]">
-              <input
-                className={input}
-                placeholder="Name"
-                value={t.name}
+      <section className={section}>
+        <h2 className={h2}>Testimonials</h2>
+        <p className="mt-1.5 text-sm text-ink-50">
+          Real quotes only. The section is hidden entirely while this is empty — which is correct.
+        </p>
+        <div className="mt-4 space-y-3">
+          {(d.testimonials ?? []).map((t, i) => (
+            <div key={i} className="space-y-2 border border-rule bg-paper p-4">
+              <textarea
+                className={`${input} h-20`}
+                placeholder="Quote"
+                value={t.quote}
                 onChange={(e) => {
                   const testimonials = [...d.testimonials];
-                  testimonials[i] = { ...t, name: e.target.value };
+                  testimonials[i] = { ...t, quote: e.target.value };
                   update({ testimonials });
                 }}
               />
-              <input
-                className={input}
-                placeholder="Role / Company"
-                value={t.role}
-                onChange={(e) => {
-                  const testimonials = [...d.testimonials];
-                  testimonials[i] = { ...t, role: e.target.value };
-                  update({ testimonials });
-                }}
-              />
-              <button
-                onClick={() => update({ testimonials: d.testimonials.filter((_, idx) => idx !== i) })}
-                className="rounded-lg border border-edge px-3 text-muted hover:text-red-400"
-              >
-                ✕
-              </button>
+              <div className="grid gap-2 sm:grid-cols-[2fr_2fr_auto]">
+                <input
+                  className={input}
+                  placeholder="Name"
+                  value={t.name}
+                  onChange={(e) => {
+                    const testimonials = [...d.testimonials];
+                    testimonials[i] = { ...t, name: e.target.value };
+                    update({ testimonials });
+                  }}
+                />
+                <input
+                  className={input}
+                  placeholder="Role / Company"
+                  value={t.role}
+                  onChange={(e) => {
+                    const testimonials = [...d.testimonials];
+                    testimonials[i] = { ...t, role: e.target.value };
+                    update({ testimonials });
+                  }}
+                />
+                <button
+                  onClick={() => update({ testimonials: d.testimonials.filter((_, x) => x !== i) })}
+                  aria-label="Remove testimonial"
+                  className="border border-rule-2 px-3 text-ink-50 hover:text-red"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
         <button
           onClick={() =>
             update({ testimonials: [...(d.testimonials ?? []), { quote: "", name: "", role: "" }] })
           }
-          className="rounded-lg border border-edge px-4 py-2 text-sm"
+          className="mt-3 border border-rule-2 px-4 py-2 text-sm"
         >
           + Add testimonial
         </button>
       </section>
 
       {/* RESUME */}
-      <section className="mt-6 space-y-3 rounded-2xl border border-edge bg-surface p-6">
-        <h2 className="font-display text-xl">CV / Resume</h2>
-        <p className="text-sm text-muted">
-          Drop your PDF into <code className="text-accent">public/</code> (e.g.{" "}
-          <code className="text-accent">resume.pdf</code>) and set the path below. Leave blank to hide
-          the Download CV button.
+      <section className={section}>
+        <h2 className={h2}>CV / Resume</h2>
+        <p className="mt-1.5 text-sm text-ink-70">
+          Drop your PDF into <code className="bg-paper-3 px-1">public/</code> and set the path.
+          Leave blank to hide the button rather than 404.
         </p>
         <input
-          className={input}
+          className={`${input} mt-3`}
           placeholder="/resume.pdf"
           value={d.resumeUrl ?? ""}
           onChange={(e) => update({ resumeUrl: e.target.value })}
@@ -397,57 +471,65 @@ export default function Admin() {
       </section>
 
       {/* SKILLS */}
-      <section className="mt-6 space-y-4 rounded-2xl border border-edge bg-surface p-6">
-        <h2 className="font-display text-xl">Skills</h2>
-        {d.skills.map((s, i) => (
-          <div key={i} className="grid gap-2 sm:grid-cols-[1fr_2fr_auto]">
-            <input
-              className={input}
-              placeholder="Category"
-              value={s.category}
-              onChange={(e) => {
-                const skills = [...d.skills];
-                skills[i] = { ...s, category: e.target.value };
-                update({ skills });
-              }}
-            />
-            <input
-              className={input}
-              placeholder="Items (comma separated)"
-              value={s.items.join(", ")}
-              onChange={(e) => {
-                const skills = [...d.skills];
-                skills[i] = { ...s, items: e.target.value.split(",").map((x) => x.trim()).filter(Boolean) };
-                update({ skills });
-              }}
-            />
-            <button
-              onClick={() => update({ skills: d.skills.filter((_, idx) => idx !== i) })}
-              className="rounded-lg border border-edge px-3 text-muted hover:text-red-400"
-            >
-              ✕
-            </button>
-          </div>
-        ))}
+      <section className={section}>
+        <h2 className={h2}>Skills</h2>
+        <div className="mt-4 space-y-2">
+          {d.skills.map((s, i) => (
+            <div key={i} className="grid gap-2 sm:grid-cols-[1fr_2fr_auto]">
+              <input
+                className={input}
+                placeholder="Category"
+                value={s.category}
+                onChange={(e) => {
+                  const skills = [...d.skills];
+                  skills[i] = { ...s, category: e.target.value };
+                  update({ skills });
+                }}
+              />
+              <input
+                className={input}
+                placeholder="Items (comma separated)"
+                value={s.items.join(", ")}
+                onChange={(e) => {
+                  const skills = [...d.skills];
+                  skills[i] = {
+                    ...s,
+                    items: e.target.value.split(",").map((x) => x.trim()).filter(Boolean),
+                  };
+                  update({ skills });
+                }}
+              />
+              <button
+                onClick={() => update({ skills: d.skills.filter((_, x) => x !== i) })}
+                aria-label={`Remove ${s.category || "skill group"}`}
+                className="border border-rule-2 px-3 text-ink-50 hover:text-red"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
         <button
           onClick={() => update({ skills: [...d.skills, { category: "", items: [] }] })}
-          className="rounded-lg border border-edge px-4 py-2 text-sm"
+          className="mt-3 border border-rule-2 px-4 py-2 text-sm"
         >
           + Add skill group
         </button>
       </section>
 
-      <div className="mt-8 flex items-center justify-between">
+      <div className="mt-8 flex items-center justify-between border-t border-rule pt-5">
         <button
           onClick={() => {
-            if (confirm("Reset all content to defaults? This clears your saved edits.")) reset();
-            setDraft(null);
+            if (confirm("Reset all content to defaults? This clears your saved edits.")) {
+              reset();
+              setDraft(null);
+            }
           }}
-          className="text-sm text-muted hover:text-red-400"
+          className="text-sm text-ink-50 hover:text-red"
         >
           Reset to defaults
         </button>
-        <Link href="/" className="text-sm text-muted hover:text-bone">
+        <Link href="/" className="text-sm text-ink-50 hover:text-ink">
           View site →
         </Link>
       </div>

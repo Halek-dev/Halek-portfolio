@@ -2,100 +2,274 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --grain: 0.035;
+/* ══════════════════════════════════════════════════════════════
+   HALEK — design system
+   Direction: Ledger (document chrome) × Contact Sheet (drenched work panels)
+
+   The page is a financial document: chroma-0 paper, near-black ink,
+   one vermilion used the way red ink is used in accounting — on
+   figures and status, never as decoration. The work interrupts that
+   document with full-bleed panels drenched in each product's own colour.
+   ══════════════════════════════════════════════════════════════ */
+
+@layer base {
+  :root {
+    /* ── surface ramp · true chroma-0, deliberately not cream ── */
+    --paper:    oklch(0.981 0 0);
+    --paper-2:  oklch(0.958 0 0);
+    --paper-3:  oklch(0.928 0 0);
+    --rule:     oklch(0.875 0 0);
+    --rule-2:   oklch(0.800 0 0);
+    /* dim text on the ink surface — ~5.6:1 on --ink */
+    --paper-4:  oklch(0.700 0 0);
+
+    /* ── ink ramp · a whisper of blue so it reads as ink, not soot ── */
+    --ink:      oklch(0.205 0.010 265);  /*  ~15.6:1 on paper  */
+    --ink-70:   oklch(0.340 0.010 265);  /*   ~9.5:1 — prose   */
+    --ink-50:   oklch(0.470 0.010 265);  /*   ~6.4:1 — labels  */
+
+    /* ── the one accent ── */
+    --red:      oklch(0.540 0.190 28);   /*   ~5.2:1 on paper  */
+    --red-deep: oklch(0.455 0.170 28);
+    --red-wash: oklch(0.540 0.190 28 / 0.08);
+
+    /* ── type ── */
+    --f-sans:  var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    --f-serif: var(--font-serif), Iowan Old Style, Georgia, serif;
+
+    /* ── motion ── */
+    --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-out-expo:  cubic-bezier(0.16, 1, 0.30, 1);
+    --dur-fast: 140ms;
+    --dur-base: 320ms;
+    --dur-slow: 640ms;
+
+    /* ── z-index scale · semantic, never arbitrary ── */
+    --z-sticky:  100;
+    --z-nav:     200;
+    --z-overlay: 300;
+    --z-menu:    400;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* the sticky masthead must not cover anchor targets */
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-sans);
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Headings are set tight and heavy; the serif is reserved for prose. */
+  h1, h2, h3 {
+    text-wrap: balance;
+    letter-spacing: -0.035em;
+    font-weight: 800;
+    line-height: 0.98;
+  }
+  h4, h5, h6 { letter-spacing: -0.02em; font-weight: 700; }
+  p { text-wrap: pretty; }
+
+  ::selection { background: var(--red); color: var(--paper); }
+
+  /* Keyboard navigation must be visible. */
+  :focus-visible {
+    outline: 2px solid var(--red);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+  :focus:not(:focus-visible) { outline: none; }
 }
 
-html {
-  scroll-behavior: smooth;
+@layer components {
+  /* ── ruled data strip · the document's core grammar ─────────── */
+  .rule-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .rule-cell {
+    padding: 0.9rem 1.25rem 0.9rem 0;
+    border-right: 1px solid var(--rule);
+  }
+  .rule-cell:last-child { border-right: 0; }
+
+  /* ── 24px minimum hit area (WCAG 2.5.8) without changing layout.
+        Used on links whose drawn underline would be pushed out of
+        place by real padding. ────────────────────────────────────── */
+  .hit { position: relative; }
+  .hit::after {
+    content: "";
+    position: absolute;
+    left: -2px;
+    right: -2px;
+    top: 50%;
+    height: 24px;
+    transform: translateY(-50%);
+  }
+
+  /* ── link with a drawn underline ────────────────────────────── */
+  .link-draw {
+    background-image: linear-gradient(var(--red), var(--red));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 2px;
+    transition: background-size var(--dur-base) var(--ease-out-quint);
+    padding-bottom: 2px;
+  }
+  .link-draw:hover,
+  .link-draw:focus-visible { background-size: 100% 2px; }
+
+  /* ── project screenshot · a scroll-linked settle.
+        Progressive enhancement only: without `animation-timeline`
+        support the image simply sits there, fully visible. It is
+        never hidden by default, so a headless render or a background
+        tab can't ship a blank panel. ─────────────────────────────── */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .panel-shot {
+        animation: shot-settle linear both;
+        animation-timeline: view();
+        animation-range: entry 5% cover 38%;
+      }
+      @keyframes shot-settle {
+        from { transform: translate3d(0, 26px, 0) scale(0.982); opacity: 0.65; }
+        to   { transform: none; opacity: 1; }
+      }
+    }
+  }
+
+  /* ── entrance · plain keyframes, never gated on a class toggle,
+        so the content is visible even if animation never runs ──── */
+  .rise {
+    animation: rise var(--dur-slow) var(--ease-out-quint) both;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translate3d(0, 14px, 0); }
+    to   { opacity: 1; transform: none; }
+  }
 }
 
-body {
-  background-color: #0a0a0f;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 92, 255, 0.15), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(212, 255, 63, 0.06), transparent);
-  background-attachment: fixed;
+/* ══════════════════════════════════════════════════════════════
+   Long-form prose — the one place the serif earns its keep
+   ══════════════════════════════════════════════════════════════ */
+.prose-doc {
+  font-family: var(--f-serif);
+  color: var(--ink-70);
+  font-size: 1.14rem;
+  line-height: 1.68;
+  max-width: 68ch;
 }
+.prose-doc > * + * { margin-top: 1.3em; }
 
-/* grain overlay */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: var(--grain);
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+.prose-doc h2 {
+  font-family: var(--f-sans);
+  color: var(--ink);
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-top: 2.75em;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--rule);
 }
-
-@keyframes rise {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.rise { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-.marquee { animation: marquee 30s linear infinite; }
-
-.prose-blog {
-  color: #c9c7c0;
-  line-height: 1.8;
-  font-size: 1.075rem;
-}
-.prose-blog h2 {
-  font-family: var(--font-display);
-  color: #e8e6e0;
-  font-size: 1.85rem;
-  font-weight: 600;
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
+.prose-doc h3 {
+  font-family: var(--f-sans);
+  color: var(--ink);
+  font-size: 1.2rem;
+  font-weight: 700;
   letter-spacing: -0.02em;
+  margin-top: 2.2em;
 }
-.prose-blog h3 {
-  font-family: var(--font-display);
-  color: #e8e6e0;
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-top: 2rem;
-  margin-bottom: 0.75rem;
-}
-.prose-blog p { margin-bottom: 1.25rem; }
-.prose-blog a {
-  color: #d4ff3f;
+.prose-doc a {
+  color: var(--ink);
   text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-decoration-thickness: 2px;
   text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
 }
-.prose-blog a:hover { color: #e8ff7a; }
-.prose-blog ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 1.25rem; }
-.prose-blog ol { list-style: decimal; padding-left: 1.5rem; margin-bottom: 1.25rem; }
-.prose-blog li { margin-bottom: 0.4rem; }
-.prose-blog code {
-  background: #1f1f2e;
+.prose-doc a:hover { color: var(--red); }
+.prose-doc ul { list-style: none; padding-left: 0; }
+.prose-doc ul li {
+  position: relative;
+  padding-left: 1.4rem;
+  margin-top: 0.5em;
+}
+.prose-doc ul li::before {
+  content: "";
+  position: absolute;
+  left: 0.15rem;
+  top: 0.66em;
+  width: 0.4rem;
+  height: 1px;
+  background: var(--red);
+}
+.prose-doc ol { list-style: decimal; padding-left: 1.3rem; }
+.prose-doc ol li { margin-top: 0.5em; padding-left: 0.25rem; }
+.prose-doc ol li::marker { color: var(--red); font-family: var(--f-sans); font-weight: 700; font-size: 0.85em; }
+.prose-doc strong { color: var(--ink); font-weight: 600; }
+.prose-doc code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.86em;
+  background: var(--paper-3);
   padding: 0.15em 0.4em;
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  font-size: 0.875em;
-  color: #d4ff3f;
+  border-radius: 2px;
+  color: var(--ink);
 }
-.prose-blog pre {
-  background: #12121a;
-  border: 1px solid #1f1f2e;
-  border-radius: 12px;
-  padding: 1.25rem;
+.prose-doc pre {
+  background: var(--ink);
+  color: var(--paper-2);
+  padding: 1.15rem 1.25rem;
   overflow-x: auto;
-  margin-bottom: 1.5rem;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  border-radius: 2px;
 }
-.prose-blog pre code { background: transparent; padding: 0; color: #c9c7c0; }
-.prose-blog blockquote {
-  border-left: 3px solid #7c5cff;
-  padding-left: 1.25rem;
-  font-style: italic;
-  color: #a8a6a0;
-  margin: 1.5rem 0;
+.prose-doc pre code { background: transparent; padding: 0; color: inherit; font-size: 1em; }
+.prose-doc blockquote {
+  font-family: var(--f-sans);
+  font-size: 1.22rem;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 1.1rem 0;
+  max-width: 34ch;
 }
-.prose-blog strong { color: #e8e6e0; font-weight: 600; }
+.prose-doc blockquote p { margin: 0; }
+.prose-doc hr { border: 0; border-top: 1px solid var(--rule); margin: 2.5em 0; }
+.prose-doc table { width: 100%; border-collapse: collapse; font-family: var(--f-sans); font-size: 0.95rem; }
+.prose-doc th {
+  text-align: left;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-50);
+  padding: 0.5rem 1rem 0.5rem 0;
+  border-bottom: 1px solid var(--ink);
+}
+.prose-doc td { padding: 0.6rem 1rem 0.6rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+
+/* ══════════════════════════════════════════════════════════════
+   Reduced motion — a crossfade, or nothing at all
+   ══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .rise { animation: none; opacity: 1; transform: none; }
+}

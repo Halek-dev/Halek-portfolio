@@ -1,6 +1,0 @@
-{
-  "_note": "This file mirrors the defaults in lib/data.ts. Export from /admin and paste here (or into lib/data.ts) to publish edits to the live site.",
-  "name": "Olalekan Kazeem",
-  "handle": "Halek",
-  "role": "Full-Stack Developer"
-}
