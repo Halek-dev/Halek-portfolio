@@ -1,5 +1,6 @@
 import { defaultData } from "@/lib/data";
 import { SITE_URL_IS_PLACEHOLDER, SITE_URL } from "@/lib/site";
+import { isSupabaseConfigured } from "@/lib/supabase/server";
 
 /**
  * Development-only checklist. Renders nothing in production builds, so it
@@ -11,6 +12,11 @@ export default function SetupNotice() {
 
   const todo: string[] = [];
 
+  if (!isSupabaseConfigured()) {
+    todo.push(
+      "Supabase not configured — /start cannot save leads. Run supabase/schema.sql, then set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local."
+    );
+  }
   if (SITE_URL_IS_PLACEHOLDER) {
     todo.push(
       `SITE_URL is the fallback (${SITE_URL}). Set NEXT_PUBLIC_SITE_URL or edit lib/site.ts — this feeds canonicals, sitemap, robots and every OG image.`
