@@ -3,18 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { defaultData } from "@/lib/data";
+import { BRAND, HERO } from "@/lib/offer";
 
 const LINKS = [
-  { href: "/#work", label: "Work" },
+  { href: "/#how", label: "How it works" },
+  { href: "/work", label: "Work" },
   { href: "/blog", label: "Writing" },
-  { href: "/#skills", label: "Stack" },
-  { href: "/#contact", label: "Contact" },
+  { href: "/#terms", label: "Referrals" },
 ];
 
 /**
  * The masthead of a document, not a floating pill nav: a rule under the
- * page, the name on the left, status on the right.
+ * page, the brand on the left, the offer on the right.
  */
 export default function Nav() {
   const [open, setOpen] = useState(false);
@@ -40,13 +40,13 @@ export default function Nav() {
       >
         <Link
           href="/"
-          className="py-1 text-[0.95rem] font-extrabold tracking-[-0.03em] transition-colors hover:text-red"
+          className="py-1 text-[1.05rem] font-extrabold tracking-[-0.04em] transition-colors hover:text-red"
         >
-          {defaultData.name}
+          {BRAND}
           <span className="text-red">.</span>
         </Link>
 
-        <div className="hidden items-center gap-7 md:flex">
+        <div className="hidden items-center gap-7 lg:flex">
           {LINKS.map((l) => (
             <a
               key={l.href}
@@ -59,13 +59,12 @@ export default function Nav() {
               {l.label}
             </a>
           ))}
-          <span className="flex items-center gap-2 text-sm font-semibold text-red">
-            <span
-              aria-hidden
-              className="h-1.5 w-1.5 rounded-full bg-red motion-safe:animate-pulse"
-            />
-            {defaultData.availability.startsWith("Available") ? "Available" : "Status"}
-          </span>
+          <Link
+            href={HERO.ctaHref}
+            className="bg-ink px-4 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-red"
+          >
+            {HERO.cta}
+          </Link>
         </div>
 
         <button
@@ -73,7 +72,7 @@ export default function Nav() {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="mobile-menu"
-          className="-mr-1 flex items-center gap-2 px-1 py-1 text-sm font-semibold md:hidden"
+          className="-mr-1 flex items-center gap-2 px-1 py-1 text-sm font-semibold lg:hidden"
         >
           {open ? "Close" : "Menu"}
           <span aria-hidden className="relative block h-3 w-4">
@@ -92,7 +91,7 @@ export default function Nav() {
       </nav>
 
       {open && (
-        <div id="mobile-menu" className="border-t border-rule bg-paper md:hidden">
+        <div id="mobile-menu" className="border-t border-rule bg-paper lg:hidden">
           <div className="mx-auto max-w-doc px-5 py-2 sm:px-8">
             {LINKS.map((l) => (
               <a
@@ -104,13 +103,13 @@ export default function Nav() {
                 {l.label}
               </a>
             ))}
-            <a
-              href="/#contact"
+            <Link
+              href={HERO.ctaHref}
               onClick={() => setOpen(false)}
               className="my-4 block bg-red px-5 py-3.5 text-center text-sm font-semibold text-paper"
             >
-              Hire me
-            </a>
+              {HERO.cta}
+            </Link>
           </div>
         </div>
       )}

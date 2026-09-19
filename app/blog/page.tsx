@@ -96,10 +96,10 @@ export default function BlogIndex() {
             Want this built rather than explained?
           </h2>
           <Link
-            href="/#contact"
+            href="/start"
             className="mt-7 inline-block bg-ink px-6 py-3.5 text-sm font-semibold text-paper transition-colors hover:bg-red"
           >
-            Get in touch →
+            Claim a free build →
           </Link>
         </section>
       </main>

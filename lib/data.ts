@@ -36,6 +36,20 @@ export type CaseSection = {
 export type CaseStudy = {
   /** One paragraph: the problem, in the client's words. */
   problem: string;
+
+  // ── the three fields below drive the case-study cards on /work ──
+  // A project appears in that section when, and only when, it has a
+  // `decision`. That is the gate: if there was no hard technical call
+  // worth defending, the project doesn't get a card. Don't invent one
+  // to fill the slot — link the work from the proof strip instead.
+
+  /** Two sentences max: the card-sized version of `problem`. */
+  problemShort?: string;
+  /** The hardest technical call, in one sentence. The card's focal point. */
+  decision?: string;
+  /** What that decision cost. A decision without a stated cost is marketing. */
+  tradeoff?: string;
+
   role: string;
   timeline: string;
   /** Hard numbers. Only include figures you can defend. */
@@ -129,6 +143,12 @@ export const defaultData: PortfolioData = {
       caseStudy: {
         problem:
           "Peer-to-peer commerce in Nigeria runs on trust that mostly isn't there. The buyer pays first and hopes; the seller ships first and hopes. Both sides lose often enough that the safe move is not to transact at all. VaultMart's premise is to remove the hoping: the money is real, it's committed, and neither side can touch it until delivery is confirmed.",
+        problemShort:
+          "Peer-to-peer trade runs on trust that mostly isn't there: the buyer pays first and hopes, the seller ships first and hopes. Both lose often enough that the safe move is not to transact at all.",
+        decision:
+          "Model escrow as an explicit state machine rather than a balance sitting on an account.",
+        tradeoff:
+          "Every new flow — refunds, partial releases, dispute outcomes — has to have its legal transitions defined before it can ship, so features land slower than they would against a balance column. What that buys is that a replayed job or a double-clicked payout cannot release money that was never delivered. There is no transition that permits it.",
         role: "Sole engineer — payments layer, data model, vendor and buyer flows, design",
         timeline: "2026 · in production",
         // NOTE: these figures are read from the live site as of this build.
@@ -189,6 +209,12 @@ export const defaultData: PortfolioData = {
       caseStudy: {
         problem:
           "Creators running several accounts at once end up doing operations work by hand across a dozen browser tabs: who has been messaged, who has already bought, which campaign actually produced revenue. The information exists but it isn't joined up, so decisions get made on memory. RanDall's job is to make the whole book of business legible in one place.",
+        problemShort:
+          "Creators running several accounts do their operations by hand across a dozen browser tabs. The information exists but it isn't joined up, so decisions get made from memory.",
+        decision:
+          "Resolve one person across every connected account into a single identity, and key all counts, spend and message state off that record.",
+        tradeoff:
+          "Resolution can be wrong, and a bad merge is expensive to unpick because it corrupts spend history and avoid-lists at the same time. Per-handle records would have been trivially correct and close to useless: they cannot answer “have we already messaged this person” across accounts, which is the question the product exists to answer.",
         role: "Sole engineer — design and build",
         timeline: "2026 · in production",
         metrics: [
@@ -235,6 +261,12 @@ export const defaultData: PortfolioData = {
       caseStudy: {
         problem:
           "A café taking orders over WhatsApp loses them the moment things get busy — the messages arrive faster than anyone can read them, and there is no record of what was promised to whom. The ask was a real ordering surface that the owner could run herself, without needing a developer to change a price.",
+        problemShort:
+          "A café taking orders over WhatsApp loses them the moment it gets busy, and there is no record of what was promised to whom.",
+        decision:
+          "Put the menu behind an admin surface as data, rather than shipping it as markup the owner has to call me to change.",
+        tradeoff:
+          "An admin surface is real work the client did not ask for and cannot see on launch day, and it hands the owner enough rope to break her own menu. Without it every price change is a deploy, which in practice means the site goes stale within a month and nobody mentions it.",
         role: "Sole engineer — design and build",
         timeline: "2026 · live",
         metrics: [
@@ -310,6 +342,12 @@ export const defaultData: PortfolioData = {
       caseStudy: {
         problem:
           "Producing many variants of the same video by hand is slow, and the usual cloud tools require uploading client media to somebody else's server. The constraint shaped the build: batch throughput, and nothing leaves the network.",
+        problemShort:
+          "Producing many variants of one video by hand is slow, and the cloud tools that automate it all want the client's media uploaded to someone else's server first.",
+        decision:
+          "Do all processing locally, so media never leaves the network.",
+        tradeoff:
+          "Throughput is capped by whatever machine it runs on: no horizontal scale, and no offloading an oversized batch to something bigger. In exchange the privacy claim is structural rather than a policy promise — it can be verified by watching the network, which is the only version of that claim worth making.",
         role: "Sole engineer — design and build",
         timeline: "2026 · live",
         metrics: [{ value: "Local", label: "processing only" }],
@@ -345,6 +383,20 @@ export const defaultData: PortfolioData = {
 /** Projects that have enough written up to justify a case-study page. */
 export function getCaseStudyProjects(): Project[] {
   return defaultData.projects.filter((p) => p.caseStudy);
+}
+
+/**
+ * Projects that earn a case-study card on /work: those with a technical
+ * decision worth defending. Everything else is still reachable from the
+ * proof strip and its own /work/[slug] page — it just doesn't get a card.
+ */
+export function getDecisionProjects(): Project[] {
+  return defaultData.projects.filter((p) => p.caseStudy?.decision);
+}
+
+/** Shipped work that isn't in the case-study section. */
+export function getOtherProjects(): Project[] {
+  return defaultData.projects.filter((p) => !p.caseStudy?.decision);
 }
 
 export function getProject(id: string): Project | undefined {

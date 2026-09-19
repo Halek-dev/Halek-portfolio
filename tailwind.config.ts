@@ -22,6 +22,8 @@ const config: Config = {
         rule: {
           DEFAULT: "var(--rule)",
           2: "var(--rule-2)",
+          // Hairline for the ink ground.
+          ink: "var(--rule-ink)",
         },
         ink: {
           DEFAULT: "var(--ink)",
@@ -32,6 +34,8 @@ const config: Config = {
           DEFAULT: "var(--red)",
           deep: "var(--red-deep)",
           wash: "var(--red-wash)",
+          // For text and rules on the ink ground only.
+          ink: "var(--red-ink)",
         },
       },
       // Modular scale, 1.25 ratio, fluid at the display end.

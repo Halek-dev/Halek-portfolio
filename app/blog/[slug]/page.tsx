@@ -168,10 +168,10 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
               </a>
             ) : (
               <Link
-                href="/#contact"
+                href="/start"
                 className="inline-block bg-ink px-6 py-3.5 text-sm font-semibold text-paper transition-colors hover:bg-red"
               >
-                Get in touch →
+                Claim a free build →
               </Link>
             )}
           </div>

@@ -33,6 +33,13 @@
     --red-deep: oklch(0.455 0.170 28);
     --red-wash: oklch(0.540 0.190 28 / 0.08);
 
+    /* Same accent, lifted for the ink ground. --red itself measures only
+       3.21:1 on --ink (fails AA for body text); this measures 6.56:1.
+       Dark sections use this one. Never swap them. */
+    --red-ink:  oklch(0.712 0.168 32);
+    /* Hairline that survives on the ink ground. */
+    --rule-ink: oklch(0.325 0.012 265);
+
     /* ── type ── */
     --f-sans:  var(--font-sans), ui-sans-serif, system-ui, sans-serif;
     --f-serif: var(--font-serif), Iowan Old Style, Georgia, serif;

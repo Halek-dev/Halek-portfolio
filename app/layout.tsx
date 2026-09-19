@@ -24,12 +24,14 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   icons: { icon: "/favicon.ico", apple: "/apple-icon.png" },
   title: {
-    default: "Olalekan Kazeem (Halek) — Full-Stack Developer",
-    template: "%s · Halek",
+    default: "HALEK — one real piece of your product, built free",
+    template: "%s · HALEK",
   },
   description:
-    "Full-stack developer building escrow marketplaces, fintech apps, creator CRMs and production web platforms with Next.js, React and PostgreSQL. Available for remote work worldwide.",
+    "A working slice of your actual product — one core feature, a hero section, or one automation — built free in about three days. You keep it. Full-stack builds with Next.js, TypeScript and PostgreSQL.",
   keywords: [
+    "free web app prototype",
+    "free website build",
     "full-stack developer",
     "next.js developer for hire",
     "escrow marketplace developer",
@@ -37,22 +39,23 @@ export const metadata: Metadata = {
     "react developer",
     "saas developer",
     "freelance web developer",
+    "business automation developer",
   ],
   alternates: { canonical: SITE_URL },
   openGraph: {
     type: "website",
-    title: "Olalekan Kazeem (Halek) — Full-Stack Developer",
+    title: "HALEK — one real piece of your product, built free",
     description:
-      "Full-stack developer building escrow marketplaces, fintech apps and production web platforms.",
+      "A working slice of your actual product, built free in about three days. You keep it either way.",
     url: SITE_URL,
-    siteName: "Halek",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Halek — Full-Stack Developer" }],
+    siteName: "HALEK",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "HALEK — free build slice" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Olalekan Kazeem (Halek) — Full-Stack Developer",
+    title: "HALEK — one real piece of your product, built free",
     description:
-      "Full-stack developer building escrow marketplaces, fintech apps and production web platforms.",
+      "A working slice of your actual product, built free in about three days. You keep it either way.",
     images: ["/og.png"],
   },
 };

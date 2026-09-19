@@ -76,7 +76,7 @@ export default function CaseStudy({ params }: { params: { slug: string } }) {
           className="bg-[var(--bg)] text-[var(--fg)]"
         >
           <div className="mx-auto max-w-doc px-5 py-12 sm:px-8 md:py-16">
-            <Link href="/#work" className="hit text-sm text-[var(--mut)] transition-colors hover:text-[var(--fg)]">
+            <Link href="/work" className="hit text-sm text-[var(--mut)] transition-colors hover:text-[var(--fg)]">
               ← All work
             </Link>
 
@@ -253,10 +253,10 @@ export default function CaseStudy({ params }: { params: { slug: string } }) {
                 </a>
               ) : (
                 <Link
-                  href="/#contact"
+                  href="/start"
                   className="bg-ink px-6 py-3.5 text-sm font-semibold text-paper transition-colors hover:bg-red"
                 >
-                  Get in touch →
+                  Claim a free build →
                 </Link>
               )}
             </div>
